@@ -41,7 +41,10 @@ public class CellButton extends JButton {
 
     public void applyCellSize(int cellSize) {
         this.cellSize = cellSize;
-        setPreferredSize(new Dimension(cellSize, cellSize));
+        Dimension dimension = new Dimension(cellSize, cellSize);
+        setPreferredSize(dimension);
+        setMinimumSize(dimension);
+        setMaximumSize(dimension);
         int fontSize = Math.max(12, cellSize / 2);
         setFont(new Font("SansSerif", Font.BOLD, fontSize));
         revalidate();
