@@ -148,6 +148,28 @@ public class GameFrame {
         gameState.reset(options);
         rebuildBoardGrid();
 
+        // Resize frame based on board size
+        int size = gameState.getBoardSize();
+        int boardPixelSize;
+        switch (size) {
+            case 15:
+                boardPixelSize = 250;
+                break;
+            case 30:
+                boardPixelSize = 450;
+                break;
+            case 50:
+                boardPixelSize = 800;
+                break;
+            default:
+                boardPixelSize = 300; // default
+                break;
+        }
+        int frameWidth = boardPixelSize + 100; // padding for borders and scroll
+        int frameHeight = boardPixelSize + 150; // padding for top panel and borders
+        frame.setSize(frameWidth, frameHeight);
+        frame.setLocationRelativeTo(null); // center again
+
         if (gameState.getCurrentTurn().equals(gameState.getPlayerSymbol())) {
             updateStatus("Lượt của bạn (" + gameState.getPlayerSymbol() + ") - Độ khó: " + difficulty + " - Bàn cờ: " + boardSize);
         } else {
@@ -164,7 +186,7 @@ public class GameFrame {
         }
 
         applyMove(new Move(row, col), gameState.getPlayerSymbol());
-        if (!finishTurn(gameState.getPlayerSymbol())) {
+        if (shouldContinueGame(gameState.getPlayerSymbol())) {
             gameState.setCurrentTurn(gameState.getComputerSymbol());
             scheduleComputerMove();
         }
@@ -179,7 +201,7 @@ public class GameFrame {
         }
     }
 
-    private boolean finishTurn(String symbol) {
+    private boolean shouldContinueGame(String symbol) {
         String winner = gameState.checkWinner(symbol);
         if (winner != null) {
             gameState.setGameOver(true);
@@ -187,7 +209,7 @@ public class GameFrame {
             updateStatus("Kết thúc ván");
             JOptionPane.showMessageDialog(frame, winner + " thắng!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
             resetBoard(new GameOptions(gameState.getPlayerSymbol(), difficulty, boardSize));
-            return true;
+            return false;
         }
 
         if (gameState.isBoardFull()) {
@@ -196,10 +218,10 @@ public class GameFrame {
             updateStatus("Kết thúc ván");
             JOptionPane.showMessageDialog(frame, "Hòa!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
             resetBoard(new GameOptions(gameState.getPlayerSymbol(), difficulty, boardSize));
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     private void scheduleComputerMove() {
@@ -222,7 +244,7 @@ public class GameFrame {
 
         Move move = computerPlayer.chooseMove(gameState, difficulty);
         applyMove(move, gameState.getComputerSymbol());
-        if (!finishTurn(gameState.getComputerSymbol())) {
+        if (shouldContinueGame(gameState.getComputerSymbol())) {
             gameState.setCurrentTurn(gameState.getPlayerSymbol());
             updateStatus("Lượt của bạn (" + gameState.getPlayerSymbol() + ") - Độ khó: " + difficulty + " - Bàn cờ: " + boardSize);
         }
@@ -258,7 +280,21 @@ public class GameFrame {
             }
         }
 
-        int boardPixelSize = cellSize * size;
+        int boardPixelSize;
+        switch (size) {
+            case 15:
+                boardPixelSize = 150;
+                break;
+            case 30:
+                boardPixelSize = 300;
+                break;
+            case 50:
+                boardPixelSize = 500;
+                break;
+            default:
+                boardPixelSize = cellSize * size;
+                break;
+        }
         boardPanel.setPreferredSize(new Dimension(boardPixelSize, boardPixelSize));
         boardPanel.revalidate();
         boardPanel.repaint();
